@@ -78,12 +78,12 @@ The application uses public music APIs and runs entirely on the frontend.
 ## Screenshots
 
 ### Main Interface
-![Main Interface](screenshot-home.png)
+![Main Interface](screenshots/screenshot-home.png)
 
 ### Track Preview
-![Track Preview-1](screenshot-track-preview-1.png)
+![Track Preview-1](screenshots/screenshot-track-preview-1.png)
 
-![Track Preview-2](screenshot-track-preview-2.png)
+![Track Preview-2](screenshots/screenshot-track-preview-2.png)
 
 
 ## Technologies Used
