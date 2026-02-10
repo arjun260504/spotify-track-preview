@@ -90,7 +90,7 @@ The application uses public music APIs and runs entirely on the frontend.
 
 - HTML
 - CSS
-- JavaScript (Vanilla)
+- JavaScript
 - Fetch API
 - Blob and Object URL APIs
 
