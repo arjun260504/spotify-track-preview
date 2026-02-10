@@ -4,7 +4,6 @@ async function downloadSong() {
 
   resultDiv.innerHTML = "";
 
-  // Validate Spotify link
   if (!link.includes("open.spotify.com/track/")) {
     alert("Please enter a valid Spotify track link.");
     return;
@@ -13,7 +12,6 @@ async function downloadSong() {
   resultDiv.innerHTML = "<p>Fetching track information...</p>";
 
   try {
-    // STEP 1: Spotify oEmbed
     const oembedRes = await fetch(
       `https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`
     );
@@ -21,7 +19,6 @@ async function downloadSong() {
 
     const query = oembed.title;
 
-    // STEP 2: iTunes Search
     const itunesRes = await fetch(
       `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=1`
     );
@@ -35,18 +32,15 @@ async function downloadSong() {
 
     const song = itunesData.results[0];
 
-    // Safe filename
     const fileName =
       song.trackName
         .replace(/[^a-z0-9]/gi, "_")
         .toLowerCase() + "-preview.m4a";
 
-    // STEP 3: Fetch preview audio as Blob
     const audioRes = await fetch(song.previewUrl);
     const audioBlob = await audioRes.blob();
     const audioObjectUrl = URL.createObjectURL(audioBlob);
 
-    // Render UI
     resultDiv.innerHTML = `
       <div class="result-grid">
 
@@ -84,7 +78,6 @@ async function downloadSong() {
   }
 }
 
-// Force browser to respect filename
 function forceDownload(url, filename) {
   const a = document.createElement("a");
   a.href = url;
@@ -94,7 +87,6 @@ function forceDownload(url, filename) {
   document.body.removeChild(a);
 }
 
-// ✅ ENTER KEY SUPPORT (Option 2)
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("spotifyLink");
 
