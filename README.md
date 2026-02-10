@@ -1,94 +1,107 @@
-# Spotify Track Explorer
+# spotify-track-preview
 
-Spotify Track Explorer is a frontend web application that allows users to paste a Spotify track link and view detailed song information such as title, artist, album, duration, and related metadata using public APIs.
-
-This project is built using **HTML, CSS, JavaScript**, and **RapidAPI**, and works completely in the browser.
+Paste a Spotify track link to view song details and download the official 30-second preview.
 
 ---
 
-## 🚀 Features
+## Overview
 
-- Paste a Spotify track link
-- Fetch and display:
-  - Song title
-  - Artist name(s)
-  - Album name
-  - Album cover image
-  - Track duration
-- Clean and responsive UI
-- Fully frontend-based (no backend required)
+This web application allows users to paste a Spotify track URL, retrieve song metadata, and download a legally available 30-second audio preview.  
+The application uses public music APIs and runs entirely on the frontend.
 
 ---
 
-## 🧑‍💻 How to Use
+## Features
 
-1. Open the website
-2. Paste a Spotify **track link**  
-   Example: https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC
-3. Click the **Fetch Song** button
-4. Song details will be displayed on the page
-
----
-
-## 🛠️ How This Project Is Built
-
-### Frontend Technologies
-- **HTML** – structure of the web page
-- **CSS** – styling and layout
-- **JavaScript** – API integration, validation, and dynamic updates
-
-### APIs Used
-
-#### Spotify oEmbed API (Official)
-- Used to extract basic metadata from a Spotify track link
-- Does not require authentication
-- Helps convert a Spotify URL into readable song information
-
-Example: https://open.spotify.com/oembed?url=SPOTIFY_TRACK_URL
-
-#### Spotify23 API (via RapidAPI)
-- Used to fetch detailed track data and lyrics-related information
-- Integrated using JavaScript `fetch()`
-- API requests are made directly from the browser
+- Accepts Spotify track URLs
+- Displays:
+  - Track name
+  - Artist
+  - Album artwork
+- Plays the official 30-second audio preview
+- Downloads the preview audio with a clean filename
+- Dark, media-player-style user interface
 
 ---
 
-## ❓ Why This Project Does Not Download Songs
+## APIs Used
 
-Spotify does not allow audio downloads through any public or official API.
+### Spotify oEmbed API
+**Endpoint:** `https://open.spotify.com/oembed`
 
-Reasons:
-- Many unofficial downloader APIs are unstable or blocked
-- Spotify does not expose direct audio (MP3/stream) URLs
+**Usage:**
+- Extracts track title and artist from a Spotify URL
 
-Instead, this project focuses on **legal and safe metadata extraction** to demonstrate API integration and frontend development skills.
-
----
-
-## 📚 What This Project Demonstrates
-
-- Third-party API integration
-- Asynchronous JavaScript using `fetch()`
-- Input validation and error handling
-- Dynamic DOM manipulation
-- Real-world API limitations and debugging
+**Reason for use:**
+- Official Spotify endpoint
+- No authentication required
+- Reliable way to identify tracks from links
+- Does not provide audio content
 
 ---
 
-## ⚠️ Disclaimer
+### iTunes Search API (Apple Music)
+**Endpoint:** `https://itunes.apple.com/search`
 
-This project is created **for educational purposes only**.  
-It does not provide or promote audio downloading from Spotify.
+**Usage:**
+- Searches for the identified track in Apple Music’s catalog
+- Retrieves the official 30-second audio preview
+
+**Reason for use:**
+- Public and legal
+- Provides downloadable preview audio
+- Stable and widely supported
+- No API key required
 
 ---
 
-## 👤 Author
+## How It Works
 
-**Arjun**
+1. The user pastes a Spotify track link
+2. The Spotify oEmbed API extracts the track metadata
+3. The extracted title is searched using the iTunes Search API
+4. If a preview is available:
+   - The audio preview is played in the browser
+   - The preview can be downloaded as an `.m4a` file
+5. The preview audio is fetched as a Blob to ensure a proper filename during download
 
 ---
 
-## ⭐ Acknowledgements
+## Download Format
 
-- Spotify
-- RapidAPI
+- Preview audio is downloaded in **M4A format**
+- This is the original format provided by the iTunes API
+- Client-side audio transcoding is not performed
+
+---
+
+## Technologies Used
+
+- HTML
+- CSS
+- JavaScript (Vanilla)
+- Fetch API
+- Blob and Object URL APIs
+
+---
+
+## Limitations
+
+- Full-length song downloads are not supported
+- Preview availability depends on the source API
+- Audio previews are limited to 30 seconds
+
+---
+
+## Usage
+
+1. Open the application
+2. Paste a Spotify track link
+3. Click **Analyze**
+4. Play or download the preview if available
+
+---
+
+## License
+
+This project is provided for educational and demonstration purposes only.
