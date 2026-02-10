@@ -1,67 +1,107 @@
-function downloadSong() {
+async function downloadSong() {
   const link = document.getElementById("spotifyLink").value.trim();
   const resultDiv = document.getElementById("result");
+
   resultDiv.innerHTML = "";
 
+  // Validate Spotify link
   if (!link.includes("open.spotify.com/track/")) {
     alert("Please enter a valid Spotify track link.");
     return;
   }
 
-  resultDiv.innerHTML = "<p>Fetching song details...</p>";
+  resultDiv.innerHTML = "<p>Fetching track information...</p>";
 
-  fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`)
-    .then(res => res.json())
-    .then(oembed => {
-      const title = oembed.title; 
-      const searchUrl =
-        `https://spotify23.p.rapidapi.com/search/?q=${encodeURIComponent(title)}&type=tracks&limit=1`;
+  try {
+    // STEP 1: Spotify oEmbed
+    const oembedRes = await fetch(
+      `https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`
+    );
+    const oembed = await oembedRes.json();
 
-      return fetch(searchUrl, {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": "bbeaa96819msh82c2bcecd9acd32p1d85e8jsnff67964c6b65",
-          "X-RapidAPI-Host": "spotify23.p.rapidapi.com"
-        }
-      });
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log("SEARCH RESULT:", data);
+    const query = oembed.title;
 
-      const track = data?.tracks?.items?.[0]?.data;
-      if (!track) {
-        alert("Song not found.");
-        resultDiv.innerHTML = "";
-        return;
-      }
+    // STEP 2: iTunes Search
+    const itunesRes = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=1`
+    );
+    const itunesData = await itunesRes.json();
 
-      resultDiv.innerHTML = `
+    if (!itunesData.results || itunesData.results.length === 0) {
+      alert("Preview not available for this track.");
+      resultDiv.innerHTML = "";
+      return;
+    }
+
+    const song = itunesData.results[0];
+
+    // Safe filename
+    const fileName =
+      song.trackName
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase() + "-preview.m4a";
+
+    // STEP 3: Fetch preview audio as Blob
+    const audioRes = await fetch(song.previewUrl);
+    const audioBlob = await audioRes.blob();
+    const audioObjectUrl = URL.createObjectURL(audioBlob);
+
+    // Render UI
+    resultDiv.innerHTML = `
+      <div class="result-grid">
+
         <img
-          src="${track.albumOfTrack.coverArt.sources[0].url}"
-          width="180"
-          class="img-fluid rounded mb-3"
+          src="${song.artworkUrl100.replace("100x100", "300x300")}"
+          class="album-art"
+          alt="Album Art"
         >
 
-        <h5>${track.name}</h5>
+        <div class="song-info">
+          <h5>${song.trackName}</h5>
 
-        <p><strong>Artist:</strong>
-          ${track.artists.items.map(a => a.profile.name).join(", ")}
-        </p>
+          <p><strong>Artist:</strong> ${song.artistName}</p>
+          <p><strong>Album:</strong> ${song.collectionName}</p>
 
-        <p><strong>Album:</strong> ${track.albumOfTrack.name}</p>
+          <audio controls>
+            <source src="${audioObjectUrl}" type="audio/mp4">
+            Your browser does not support the audio element.
+          </audio>
 
-        <p><strong>Duration:</strong>
-          ${Math.floor(track.duration.totalMilliseconds / 60000)}:
-          ${Math.floor((track.duration.totalMilliseconds % 60000) / 1000)
-            .toString()
-            .padStart(2, "0")}
-        </p>
-      `;
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error fetching song details.");
-      resultDiv.innerHTML = "";
-    });
+          <button
+            class="btn btn-warning download-btn w-100"
+            onclick="forceDownload('${audioObjectUrl}', '${fileName}')"
+          >
+            Download 30s Preview
+          </button>
+        </div>
+
+      </div>
+    `;
+  } catch (error) {
+    console.error(error);
+    alert("Error fetching track preview.");
+    resultDiv.innerHTML = "";
+  }
 }
+
+// Force browser to respect filename
+function forceDownload(url, filename) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ✅ ENTER KEY SUPPORT (Option 2)
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("spotifyLink");
+
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      downloadSong();
+    }
+  });
+});
